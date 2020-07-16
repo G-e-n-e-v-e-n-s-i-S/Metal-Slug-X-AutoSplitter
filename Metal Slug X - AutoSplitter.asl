@@ -339,11 +339,13 @@ exit
 	//The pointers and watchers are no longer valid
 	vars.pointerScreen = IntPtr.Zero;
 	
-	vars.watcherScreen = null;
+	vars.watcherScreen = new MemoryWatcher<short>(IntPtr.Zero);
+
+	vars.watcherScreen.FailAction = MemoryWatcher.ReadFailAction.SetZeroOrNull;
 
 	vars.pointerBossHealth = IntPtr.Zero;
 
-	vars.watcherBossHealth = null;
+	vars.watcherBossHealth = new MemoryWatcher<short>(IntPtr.Zero);
 
 }
 
@@ -466,7 +468,7 @@ reset
 		
 		vars.pointerBossHealth = IntPtr.Zero;
 
-		vars.watcherBossHealth = null;
+		vars.watcherBossHealth = new MemoryWatcher<short>(IntPtr.Zero);
 
 		return true;
 	}
