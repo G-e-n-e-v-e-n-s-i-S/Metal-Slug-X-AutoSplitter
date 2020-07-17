@@ -247,6 +247,25 @@ init
 		
 		
 
+		//The grey of the UI
+		//Starts at pixel ( 80 , 8 )
+		vars.colorsUI = new byte[]				{
+													184,	168,	160,	0,
+													184,	168,	160,	0,
+													184,	168,	160,	0,
+													184,	168,	160,	0,
+													184,	168,	160,	0,
+													184,	168,	160,	0,
+													184,	168,	160,	0,
+													184,	168,	160,	0,
+													184,	168,	160,	0,
+													184,	168,	160,	0
+												};
+
+		vars.offsetUI = 0x2740;
+		
+		
+		
 		//The rim of Rugname when it hits the ground after phase 1
 		//Starts at pixel ( 159 , 159 )
 		vars.colorsBossStart = new byte[]		{
@@ -309,6 +328,25 @@ init
 
 		
 
+		//The grey of the UI
+		//Starts at pixel ( 80 , 8 )
+		vars.colorsUI = new byte[]				{
+													189,	170,	165,	255,
+													189,	170,	165,	255,
+													189,	170,	165,	255,
+													189,	170,	165,	255,
+													189,	170,	165,	255,
+													189,	170,	165,	255,
+													189,	170,	165,	255,
+													189,	170,	165,	255,
+													189,	170,	165,	255,
+													189,	170,	165,	255
+												};
+
+		vars.offsetUI = 0x416F;
+		
+		
+		
 		//The rim of Rugname when it hits the ground after phase 1
 		//Starts at pixel ( 159 , 159 )
 		vars.colorsBossStart = new byte[]		{
@@ -437,9 +475,9 @@ update
 	{
 		
 		//Debug print an array
-		//print("Rugname");
+		//print("RunStart");
 		
-		//vars.PrintArray(vars.ReadArray(game, vars.offsetStart));
+		//vars.PrintArray(vars.ReadArray(game, vars.offsetRunStart));
 
 		
 	
@@ -497,7 +535,7 @@ split
 	//Check time since last split, don't split if we already split in the last 20 seconds
 	var timeSinceLastSplit = Environment.TickCount - vars.prevSplitTime;
 	
-	if (vars.prevSplitTime != -1 && timeSinceLastSplit< 20000)
+	if (vars.prevSplitTime != -1 && timeSinceLastSplit < 20000)
 	{
 		return false;
 	}
@@ -513,26 +551,42 @@ split
 
 
 	//Missions 1, 2, 3, 4 and 5
-	if (vars.splitCounter< 5)
+	if (vars.splitCounter < 10)
 	{
 		
-		//Split when the exclamation mark from the "Mission Complete !" text is in the right spot
-		byte[] pixels = vars.ReadArray(game, vars.offsetExclamationMark);
-
-		if (vars.MatchArray(pixels, vars.colorsExclamationMark))
+		if (vars.splitCounter % 2 == 0)
 		{
-			vars.splitCounter++;
 			
-			vars.prevSplitTime = Environment.TickCount;
+			//Check for the exclamation mark from the "Mission Complete !" text
+			byte[] pixels = vars.ReadArray(game, vars.offsetExclamationMark);
 			
-			return true;
+			if (vars.MatchArray(pixels, vars.colorsExclamationMark))
+			{
+				vars.splitCounter++;
+			}
+		}
+
+		else
+		{
+
+			//Split when the UI disappears after we've seen the exclamation mark
+			byte[] pixels = vars.ReadArray(game, vars.offsetUI);
+			
+			if (!vars.MatchArray(pixels, vars.colorsUI))
+			{
+				vars.splitCounter++;
+			
+				vars.prevSplitTime = Environment.TickCount;
+			
+				return true;
+			}
 		}
 	}
 
 
 
 	//Knowing when we get to the last phase of the last boss
-	else if (vars.splitCounter == 5)
+	else if (vars.splitCounter == 10)
 	{
 		
 		//When Rugname hits the ground
@@ -562,7 +616,7 @@ split
 
 
 	//Finding the boss's health variable
-	else if (vars.splitCounter == 6)
+	else if (vars.splitCounter == 11)
 	{
 		
 		//Check time since last scan, don't scan if we already scanned in the last 8 seconds
@@ -614,7 +668,7 @@ split
 
 
 	//Check that the boss's health has been reset above 0
-	else if (vars.splitCounter == 7)
+	else if (vars.splitCounter == 12)
 	{
 		
 		vars.watcherBossHealth.Update(game);
@@ -636,7 +690,7 @@ split
 
 
 	//Check that the boss's health has been reduced to 0
-	else if (vars.splitCounter == 8)
+	else if (vars.splitCounter == 13)
 	{
 
 		//Update watcher
