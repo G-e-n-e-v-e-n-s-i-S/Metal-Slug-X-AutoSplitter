@@ -421,11 +421,6 @@ update
 		if (vars.watcherScreen.Changed)
 		{
 			
-			//Notify
-			print("[MSX AutoSplitter] Screen region changed");
-
-
-
 			//Void the pointer
 			vars.pointerScreen = IntPtr.Zero;
 
@@ -484,10 +479,15 @@ update
 	if (vars.pointerScreen != IntPtr.Zero)
 	{
 		
-		//Debug print an array
-		//print("RunStart");
-		
-		//vars.PrintArray(vars.ReadArray(game, vars.offsetRunStart));
+		//Debug print
+		/*
+		if (vars.localTickCount % 10 == 0)
+		{
+			print("[MSX AutoSplitter] " + vars.splitCounter.ToString() + " - " + "RunStart");
+			
+			vars.PrintArray(vars.ReadArray(game, vars.offsetRunStart));
+		}
+		*/
 
 		
 	
@@ -531,6 +531,18 @@ start
 	
 	if (vars.restart)
 	{
+		vars.splitCounter = 0;
+		
+		vars.prevSplitTime = -1;
+		
+		vars.prevScanTimeScreen = -1;
+
+		vars.prevScanTimeBossHealth = -1;
+		
+		vars.pointerBossHealth = IntPtr.Zero;
+
+		vars.watcherBossHealth = new MemoryWatcher<short>(IntPtr.Zero);
+		
 		return true;
 	}
 }
@@ -560,25 +572,6 @@ split
 
 
 
-	//Debug Print
-	if (vars.localTickCount % 10 == 0)
-	{
-		byte[] bytes = vars.ReadArray(game, vars.offsetExclamationMark);
-
-		var str = new System.Text.StringBuilder();
-
-		for (int i = 0; i<bytes.Length; i++)
-		{
-			str.Append(bytes[i].ToString());
-
-			str.Append(" ");
-		}
-
-		print(vars.splitCounter.ToString() + " - " + str.ToString());
-	}
-
-
-
 	//Missions 1, 2, 3, 4 and 5
 	if (vars.splitCounter < 10)
 	{
@@ -597,7 +590,7 @@ split
 
 		else
 		{
-
+			
 			//Split when the UI disappears after we've seen the exclamation mark
 			byte[] pixels = vars.ReadArray(game, vars.offsetUI);
 			
@@ -624,11 +617,6 @@ split
 		if (vars.MatchArray(pixels, vars.colorsBossStart))
 		{
 			
-			//Notify
-			print("[MSX AutoSplitter] Last fight starting");
-
-
-
 			//Clear the pointer to the boss's health
 			vars.pointerBossHealth = IntPtr.Zero;
 			
@@ -705,11 +693,6 @@ split
 		if (vars.watcherBossHealth.Current > 0)
 		{
 			
-			//Notify
-			print("[MSX AutoSplitter] Monitoring health");
-
-
-
 			//Go to next phase
 			vars.splitCounter++;
 
@@ -730,8 +713,6 @@ split
 		//Split when the boss's health reaches 0
 		if (vars.watcherBossHealth.Current == 0)
 		{
-			print("[MSX AutoSplitter] Run end");
-
 			vars.splitCounter++;
 
 			vars.prevSplitTime = Environment.TickCount;
