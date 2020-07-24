@@ -181,6 +181,11 @@ startup
 	//The split/state we are currently on
 	vars.splitCounter = 0;
 	
+
+	
+	//A local tickCount to do stuff sometimes
+	vars.localTickCount = 0;
+
 }
 
 
@@ -394,6 +399,11 @@ exit
 update
 {
 	
+	//Increase local tickCount
+	vars.localTickCount = vars.localTickCount + 1;
+
+
+
 	//Try to find the screen
 	//For Kawaks, follow the pointer path
 	if(game.ProcessName.Equals("WinKawaks"))
@@ -546,6 +556,25 @@ split
 	if (vars.pointerScreen == IntPtr.Zero)
 	{
 		return false;
+	}
+
+
+
+	//Debug Print
+	if (vars.localTickCount % 10 == 0)
+	{
+		byte[] bytes = vars.ReadArray(game, vars.offsetExclamationMark);
+
+		var str = new System.Text.StringBuilder();
+
+		for (int i = 0; i<bytes.Length; i++)
+		{
+			str.Append(bytes[i].ToString());
+
+			str.Append(" ");
+		}
+
+		print(vars.splitCounter.ToString() + " - " + str.ToString());
 	}
 
 
