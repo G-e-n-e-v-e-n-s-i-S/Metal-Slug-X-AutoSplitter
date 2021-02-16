@@ -507,7 +507,7 @@ update
 
 
 	//Try to find the screen
-	//For Kawaks, follow the pointer path
+	//For Kawaks and FightCade, follow the pointer path
 	if(game.ProcessName.Equals("WinKawaks") || game.ProcessName.Equals("fcadefbneo"))
 	{
 		vars.pointerScreen = new IntPtr(current.pointerScreen);
