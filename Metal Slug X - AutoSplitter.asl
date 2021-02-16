@@ -11,6 +11,11 @@ state("WinKawaks")
 	int pointerScreen : 0x0046B270;
 }
 
+state("fcadefbneo")
+{
+	int pointerScreen : 0x02CC2280, 0x4, 0x4, 0x14;
+}
+
 
 
 
@@ -23,9 +28,7 @@ startup
 	{
 
 		IntPtr pointer = IntPtr.Zero;
-
-
-
+		
 		foreach (var page in process.MemoryPages())
 		{
 
@@ -36,9 +39,7 @@ startup
 			if (pointer != IntPtr.Zero) break;
 
 		}
-
-
-
+		
 		return pointer;
 
 	};
@@ -47,13 +48,13 @@ startup
 
 
 
-	//A function that reads an array of 40 bytes in the screen memory
+	//A function that reads an array of 60 bytes in the screen memory
 	Func<Process, int, byte[]> ReadArray = (process, offset) =>
 	{
 
-		byte[] bytes = new byte[40];
+		byte[] bytes = new byte[60];
 
-		bool succes = ExtensionMethods.ReadBytes(process, vars.pointerScreen + offset, 40, out bytes);
+		bool succes = ExtensionMethods.ReadBytes(process, vars.pointerScreen + offset, 60, out bytes);
 
 		if (!succes)
 		{
@@ -77,7 +78,7 @@ startup
 			return false;
 		}
 
-		for (int i = 0; i < bytes.Length; i++)
+		for (int i = 0; i < bytes.Length && i < colors.Length; i++)
 		{
 
 			if (bytes[i] != colors[i])
@@ -292,6 +293,107 @@ init
 
 
 
+	else if (game.ProcessName.Equals("fcadefbneo"))
+	{
+		
+		//The footsteps in the sand when the character hits the ground at the start of mission 1
+		//Starts at pixel ( 104 , 147 )
+		vars.colorsRunStart = new byte[]		{
+													198, 115, 115, 0,
+													198, 115, 115, 0,
+													156, 82,  90,  0,
+													156, 82,  90,  0,
+													107, 57,  66,  0,
+													107, 57,  66,  0,
+													132, 74,  74,  0,
+													132, 74,  74,  0,
+													156, 82,  90,  0,
+													156, 82,  90,  0,
+													156, 82,  90,  0,
+													156, 82,  90,  0,
+													181, 99,  99,  0,
+													181, 99,  99,  0,
+													181, 99,  99,  0
+												};
+		
+		vars.offsetRunStart = 0xAEC40;
+		
+		
+		
+		//The exclamation mark in the Mission Complete !" text
+		//Starts at pixel ( 247 , 113 )
+		vars.colorsExclamationMark = new byte[] {
+													0,   0,   0,   0,
+													0,   0,   0,   0,
+													255, 255, 255, 0,
+													255, 255, 255, 0,
+													0,   0,   123, 0,
+													0,   0,   123, 0,
+													49,  214, 255, 0,
+													49,  214, 255, 0,
+													24,  148, 255, 0,
+													24,  148, 255, 0,
+													49,  214, 255, 0,
+													49,  214, 255, 0,
+													24,  148, 255, 0,
+													24,  148, 255, 0,
+													49,  214, 255, 0
+												};
+
+		vars.offsetExclamationMark = 0x86AB8;
+		
+		
+
+		//The grey of the UI
+		//Starts at pixel ( 80 , 8 )
+		vars.colorsUI = new byte[]				{
+													189, 173, 165, 0,
+													189, 173, 165, 0,
+													189, 173, 165, 0,
+													189, 173, 165, 0,
+													189, 173, 165, 0,
+													189, 173, 165, 0,
+													189, 173, 165, 0,
+													189, 173, 165, 0,
+													189, 173, 165, 0,
+													189, 173, 165, 0,
+													189, 173, 165, 0,
+													189, 173, 165, 0,
+													189, 173, 165, 0,
+													189, 173, 165, 0,
+													189, 173, 165, 0
+												};
+
+		vars.offsetUI = 0x9A80;
+		
+		
+		
+		//The rim of Rugname when it hits the ground after phase 1
+		//Starts at pixel ( 159 , 159 )
+		vars.colorsBossStart = new byte[]		{
+													90, 107, 107, 0,
+													90, 107, 107, 0,
+													90, 107, 107, 0,
+													90, 107, 107, 0,
+													90, 107, 107, 0,
+													90, 107, 107, 0,
+													90, 107, 107, 0,
+													90, 107, 107, 0,
+													90, 107, 107, 0,
+													90, 107, 107, 0,
+													90, 107, 107, 0,
+													90, 107, 107, 0,
+													90, 107, 107, 0,
+													90, 107, 107, 0,
+													90, 107, 107, 0
+												};
+		
+		vars.offsetBossStart = 0xBD1F8;
+
+	}
+
+
+
 	else //if(game.ProcessName.Equals("mslugx"))
 	{
 		
@@ -406,7 +508,7 @@ update
 
 	//Try to find the screen
 	//For Kawaks, follow the pointer path
-	if(game.ProcessName.Equals("WinKawaks"))
+	if(game.ProcessName.Equals("WinKawaks") || game.ProcessName.Equals("fcadefbneo"))
 	{
 		vars.pointerScreen = new IntPtr(current.pointerScreen);
 	}
@@ -483,7 +585,7 @@ update
 		/*
 		if (vars.localTickCount % 10 == 0)
 		{
-			print("[MSX AutoSplitter] " + vars.splitCounter.ToString() + " - " + "RunStart");
+			print("[MSX AutoSplitter] Debug " + vars.splitCounter.ToString());
 			
 			vars.PrintArray(vars.ReadArray(game, vars.offsetRunStart));
 		}
