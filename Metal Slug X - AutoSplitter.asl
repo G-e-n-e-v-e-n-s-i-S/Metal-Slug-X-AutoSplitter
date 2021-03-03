@@ -132,6 +132,11 @@ startup
 
 
 
+	//The time at which the last reset happenend
+	vars.prevRestartTime = Environment.TickCount;
+
+
+
 	//An array of bytes to find the screen's pixel array memory region
 	vars.scannerTargetScreen = new SigScanTarget(0, "10 08 00 00 ?? ?? 00 ?? ?? ?? ?? 00 00 00 04 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 20");
 
@@ -593,9 +598,19 @@ update
 
 		
 	
-		//Check if we should start/restart the timer
-		vars.restart = vars.MatchArray(vars.ReadArray(game, vars.offsetRunStart), vars.colorsRunStart);
+		//Check time since last reset, don't reset if we already reset in the last second
+		var timeSinceLastReset = Environment.TickCount - vars.prevRestartTime;
 		
+		if (timeSinceLastReset< 1000)
+		{
+			vars.restart = false;
+		}
+		
+		//Otherwise, check if we should start/restart the timer
+		else
+		{
+			vars.restart = vars.MatchArray(vars.ReadArray(game, vars.offsetRunStart), vars.colorsRunStart);
+		}
 	}
 }
 
@@ -610,6 +625,8 @@ reset
 	{
 		vars.splitCounter = 0;
 		
+		vars.prevRestartTime = Environment.TickCount;
+
 		vars.prevSplitTime = -1;
 		
 		vars.prevScanTimeScreen = -1;
@@ -635,6 +652,8 @@ start
 	{
 		vars.splitCounter = 0;
 		
+		vars.prevRestartTime = Environment.TickCount;
+
 		vars.prevSplitTime = -1;
 		
 		vars.prevScanTimeScreen = -1;
