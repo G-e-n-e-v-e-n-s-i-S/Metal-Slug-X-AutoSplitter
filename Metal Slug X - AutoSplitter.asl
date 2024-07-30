@@ -13,7 +13,7 @@ state("WinKawaks")
 
 state("fcadefbneo")
 {
-	int pointerScreen : 0x02D4E454, 0x4, 0xF4;
+	int pointerScreen : 0x02D73FD0, 0x4, 0xF4;
 	//int pointerScreen : 0x02D4D8D4, 0x4, 0x4, 0x14;
 }
 
